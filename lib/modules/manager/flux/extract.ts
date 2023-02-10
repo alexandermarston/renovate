@@ -176,7 +176,15 @@ function resolveResourceManifest(
                 resource.metadata?.namespace)
         );
         if (matchingRepositories.length) {
-          dep.registryUrls = matchingRepositories.map((repo) => repo.spec.url);
+          dep.registryUrls = matchingRepositories.map((repo) => {
+            if (
+              repo.spec.url.startsWith('oci://') ||
+              !repo.spec.url.includes('://')
+            ) {
+              return repo.spec.url.replace('oci://', '');
+            }
+            return repo.spec.url;
+          });
         } else {
           dep.skipReason = 'unknown-registry';
         }
